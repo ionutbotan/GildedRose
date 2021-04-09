@@ -5,7 +5,7 @@ namespace GildedRose.Console
     class Program
     {
         private static IList<Item> Items;
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             System.Console.WriteLine("OMGHAI!");
 
@@ -35,60 +35,77 @@ namespace GildedRose.Console
         {
             for (var i = 0; i < Items.Count; i++)
             {
-                if (Items[i].Name != "Sulfuras, Hand of Ragnaros") continue;
-
-
-                if (Items[i].Name == "Aged Brie" || Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
+                switch (Items[i].Name)
                 {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality++;
+                    case "Sulfuras, Hand of Ragnaros": break;
 
-                        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].SellIn < 11 && Items[i].Quality < 50)
-                            {
-                                Items[i].Quality++;
-                            }
+                    case "Aged Brie":
+                        UpdateAsAgedBrie(i);
+                        break;
 
-                            if (Items[i].SellIn < 6 && Items[i].Quality < 50)
-                            {
-                                Items[i].Quality++;
-                            }
-                        }
-                    }
-                }
-                else if (Items[i].Quality > 0)
-                {
-                    Items[i].Quality--;
-                }
+                    case "Backstage passes to a TAFKAL80ETC concert":
+                        UpdateAsConcertPass(i);
+                        break;
 
+                    case "Conjured Mana Cake":
+                        UpdateAsManaCake(i);
+                        break;
 
-
-                Items[i].SellIn--;
-
-
-                if (Items[i].SellIn < 0)
-                {
-                    if (Items[i].Name == "Aged Brie")
-                    {
-                        if (Items[i].Quality < 50)
-                        {
-                            Items[i].Quality++;
-                        }
-                    }
-                    else if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                    {
-                        Items[i].Quality -= Items[i].Quality;
-                    }
-                    else if (Items[i].Quality > 0)
-                    {
-                        Items[i].Quality--;
-                    }
+                    default:
+                        UpdateAsNormalItem(i);
+                        break;
                 }
             }
         }
 
+        private static void UpdateAsNormalItem(int i)
+        {
+            if (Items[i].Quality > 0) Items[i].Quality--;
+
+            Items[i].SellIn--;
+
+            if (Items[i].SellIn < 0 && Items[i].Quality > 0) Items[i].Quality--;
+        }
+
+        private static void UpdateAsManaCake(int i)
+        {
+            if (Items[i].Quality > 0) Items[i].Quality -= 2;
+
+            Items[i].SellIn--;
+
+            if (Items[i].SellIn < 0 && Items[i].Quality > 0) Items[i].Quality -= 2;
+        }
+
+        private static void UpdateAsConcertPass(int i)
+        {
+            if (Items[i].Quality < 50)
+            {
+                Items[i].Quality++;
+
+                if (Items[i].SellIn < 11 && Items[i].Quality < 50)
+                {
+                    Items[i].Quality++;
+                }
+
+                if (Items[i].SellIn < 6 && Items[i].Quality < 50)
+                {
+                    Items[i].Quality++;
+                }
+            }
+
+            Items[i].SellIn--;
+
+            if (Items[i].SellIn < 0) Items[i].Quality = 0;
+        }
+
+        private static void UpdateAsAgedBrie(int i)
+        {
+            if (Items[i].Quality < 50) Items[i].Quality++;
+
+            Items[i].SellIn--;
+
+            if (Items[i].SellIn < 0 && Items[i].Quality < 50) Items[i].Quality++;
+        }
     }
 
     public class Item
